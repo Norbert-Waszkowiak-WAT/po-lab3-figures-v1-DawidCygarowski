@@ -1,26 +1,30 @@
-#ifndef POINT_CPP
-#define POINT_CPP
-
-#include <cmath>
+#include "point.h"
 #include <sstream>
-#include <string>
-
-struct Point {
-    double x;
-    double y;
-
-    Point() : x(0.0), y(0.0) {}
-    Point(double x_, double y_) : x(x_), y(y_) {}
-
-    bool equals(const Point &other, double eps = 1e-9) const {
-        return std::fabs(x - other.x) <= eps && std::fabs(y - other.y) <= eps;
-    }
-
-    std::string toString() const {
-        std::ostringstream oss;
-        oss << "(" << x << ", " << y << ")";
-        return oss.str();
-    }
-};
-
-#endif
+#include <iostream>
+#include <iomanip>
+ 
+Point::Point(double x, double y) : x(x), y(y) {}
+Point::Point(const Point &other) : x(other.x), y(other.y) {}
+bool Point::equals(Point &other){
+    return (x == other.x && y == other.y);
+}
+double Point::getX(){
+    return x;
+}
+double Point::getY(){
+    return y;
+}
+void Point::flip(){
+    x = -x;
+    y = -y;
+}
+void Point::move(double x, double y){
+    this ->x += x;
+    this ->y += y;
+}
+std::string Point::toString(){
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(1);
+    oss << "Point(" << x << ", " << y << ")";
+    return oss.str();
+}

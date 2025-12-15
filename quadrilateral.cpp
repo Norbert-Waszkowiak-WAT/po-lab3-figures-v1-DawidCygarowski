@@ -1,63 +1,47 @@
-#include "quadrilateral.cpp"
-#include <cmath>
+#include "quadrilateral.h"
 #include <sstream>
-
-// Konstruktor domyślny (czworokąt zerowy)
-Quadrilateral::Quadrilateral()
-    : a(), b(), c(), d() { }
-
-Quadrilateral::Quadrilateral(const Point &a_, const Point &b_, const Point &c_, const Point &d_)
-    : a(a_), b(b_), c(c_), d(d_) { }
-
-Quadrilateral::Quadrilateral(const Quadrilateral &other)
-    : a(other.a), b(other.b), c(other.c), d(other.d) { }
-
-bool Quadrilateral::equals(const Quadrilateral &other, double eps) const {
-    return a.equals(other.a, eps)
-        && b.equals(other.b, eps)
-        && c.equals(other.c, eps)
-        && d.equals(other.d, eps);
+#include <iomanip>
+#include <cmath>
+ 
+Quadrilateral::Quadrilateral(Point a, Point b, Point c, Point d): a(a), b(b), c(c), d(d) {}
+ 
+Quadrilateral::Quadrilateral(const Quadrilateral &other): a(other.a), b(other.b), c(other.c), d(other.d) {}
+ 
+bool Quadrilateral::equals(Quadrilateral &other){
+    return a.equals(other.a) && b.equals(other.b) && c.equals(other.c) && d.equals(other.d);
 }
-
-void Quadrilateral::flip() {
-    // Odwracamy kolejność wierzchołków zachowując 'a' jako pierwszy:
-    // a, b, c, d -> a, d, c, b
-    Point oldB = b;
-    Point oldD = d;
-    b = oldD;
-    d = oldB;
-    // c pozostaje na swoim miejscu (środek pary)
+ 
+void Quadrilateral::flip(){
+    a.flip();
+    b.flip();
+    c.flip();
+    d.flip();
 }
-
-// Przesunięcie o (dx, dy)
-void Quadrilateral::move(double dx, double dy) {
-    a.x += dx; a.y += dy;
-    b.x += dx; b.y += dy;
-    c.x += dx; c.y += dy;
-    d.x += dx; d.y += dy;
+ 
+void Quadrilateral::move(double x, double y){
+    a.move(x,y);
+    b.move(x,y);
+    c.move(x,y);
+    d.move(x,y);
 }
-
-// Pole czworokąta liczymy wzorem shoelace (gauss) dla czterech punktów
-double Quadrilateral::getSurface() const {
-    // Wzór: 0.5 * | sum_{i=0}^{n-1} x_i*y_{i+1} - x_{i+1}*y_i |
-    // z indeksami cyklicznymi; n = 4
-    double xs[4] = { a.x, b.x, c.x, d.x };
-    double ys[4] = { a.y, b.y, c.y, d.y };
-    double sum = 0.0;
-    for (int i = 0; i < 4; ++i) {
-        int j = (i + 1) % 4;
-        sum += xs[i] * ys[j] - xs[j] * ys[i];
-    }
-    return std::fabs(sum) * 0.5;
+ 
+static double triangleArea(Point &p1, Point &p2, Point &p3){
+    double x1 = p1.getX();
+    double y1 = p1.getY();
+    double x2 = p2.getX();
+    double y2 = p2.getY();
+    double x3 = p3.getX();
+    double y3 = p3.getY();
+    double area = 0.5 * std::fabs(x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2));
+    return area;
 }
-
-std::string Quadrilateral::toString() const {
+ 
+double Quadrilateral::getSurface(){
+    return triangleArea(a,b,c) + triangleArea(a,c,d);
+}
+ 
+std::string Quadrilateral::toString(){
     std::ostringstream oss;
-    oss << "Quadrilateral:\n"
-        << "  a: " << a.toString() << "\n"
-        << "  b: " << b.toString() << "\n"
-        << "  c: " << c.toString() << "\n"
-        << "  d: " << d.toString() << "\n"
-        << "  surface: " << getSurface();
+    oss << "Quadrilateral(" << a.toString() << ", " << b.toString() << ", " << c.toString() << ", " << d.toString() << ")";
     return oss.str();
 }
